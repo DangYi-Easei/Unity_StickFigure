@@ -1,0 +1,24 @@
+创建：
+1.创建需要的Excel表格，按照规定格式：
+	(第一行：变量名，
+	 第二行：变量类型
+		(目前只支持int float bool string，
+		 若想拓展其他类型，
+		 可在ExcelTool脚本中的GenerateExcelTool方法中添加，再在BinaryDataMgr脚本中的LoadTable方法中增加对应逻辑)，
+	 第三行：选定哪个变量为key，
+	 第四行：注释，无特殊作用
+	 第五-N行：数据)
+2.将Excel放在Assets/ArtRes/Excel/文件夹中，可在ExcelTool脚本中修改EXCEL_PATH，来改变路径
+3.点击GameTool中的GenerateExcel，会自动创建表格中数据对应的数据结构类脚本和数据容器类脚本
+	(分别存放在Scipts/ExcelData/DataClass和Scipts/ExcelData/Container中
+	 可在ExcelTool脚本中修改DATA_CLASS_PATH和DATA_CONTAINER_PATH来更改路径)
+
+调用：
+1.在BinaryDataMgr脚本中的Init方法中按照注释方法进行数据初始化
+2.在需要调用数据的脚本中调用BinaryDataMgr的Init方法
+3.接下来，就可以声明一个你所需的数据容器类对象，调用BinaryDataMgr中的GetTable<T>方法对其赋值，然后使用其中数据
+ （注意：GetTable<>方法 返回值为 存储所有表格的字典 中 对应typeof(T).Name 的 键 的对应值，并且值的类型也是字典）
+ （例：TowerInfoContainer dataDic = BinaryDataMgr.Instance.GetTable<TowerInfoContainer>();）
+4.生成的2进制文件路径在StreamingAssets/Binary/中，可修改BinaryDataMgr脚本中的DATA_BINARY_PATH来更改路径
+
+
