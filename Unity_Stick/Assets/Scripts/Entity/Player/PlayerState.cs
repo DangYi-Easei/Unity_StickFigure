@@ -2,9 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum E_PlayerStateType
+{
+    Ground,
+    Air
+}
+
 public class PlayerState
 {
     protected PlayerStateMachine stateMachine;
+    public E_PlayerStateType playerStateType;
     protected Player player;
 
     protected Rigidbody2D rb;
@@ -16,11 +24,11 @@ public class PlayerState
     protected float stateTimer;//×´Ì¬¼ÆÊ±Æ÷
     protected bool triggerCalled;//´¥·¢Æ÷
 
-    public PlayerState(Player _player,PlayerStateMachine _stateMachine,string _animBoolName)
+    public PlayerState(Player _player,PlayerStateMachine _stateMachine,string _animBoolName, E_PlayerStateType _playerStateType)
     {
         this.player = _player;
         this.stateMachine = _stateMachine;
-        this.rb = _player.rb;
+        this.animBoolName = _animBoolName;
     }
 
 

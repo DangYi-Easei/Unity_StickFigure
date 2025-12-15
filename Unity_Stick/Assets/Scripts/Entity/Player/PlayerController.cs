@@ -2,30 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : Entity
+public class PlayerController : BaseManager<PlayerController>
 {
-    [Header("移动参数（关联GameConfig）")]
-    public float moveSpeed;
-    public float jumpForce;
-
-
-    // 存储当前移动方向
-    private Vector2 moveDirection;
-
-    private bool isOnGrounded;
-    private bool isOnSky;
-    private bool isOnWall;
-
-
-    //
-    private int atkComboNum;
-    private int atkComboMaxNum;
-    private bool isAttacking;
 
     // Start is called before the first frame update
-    protected override void Start()
+    public void ControllerOpen()
     {
-
         // 开启输入检测
         InputMgr.GetInstance().StartOrEndCheck(true);
 
@@ -33,53 +15,48 @@ public class PlayerController : Entity
         EventCenter.GetInstance().AddEventListener<KeyCode>("某键按下", OnKeyDown);
         // 注册抬起输入事件监听
         EventCenter.GetInstance().AddEventListener<KeyCode>("某键抬起", OnKeyUp);
-
-        
-
-    }
-
-    // Update is called once per frame
-    protected override void Update()
-    {
-        if (isOnGrounded)
-        {
-            GroundedMoveCheck();
-        }
-        else if (isOnWall)
-        {
-            SkyMoveCheck();
-        }
-        else if (isOnSky)
-        {
-            WallMoveCheck();
-        }
-        
     }
 
     // 按键按下时
     private void OnKeyDown(KeyCode key)
     {
-        switch (key)
+        //地面操作
+        if (Player.Instance.stateMachine.currentState.playerStateType == E_PlayerStateType.Ground)
         {
-            case KeyCode.W:
+            switch (key)
+            {
+                case KeyCode.Mouse0:
+                    Player.Instance.stateMachine.ChangeState(Player.Instance.primaryAttack);
 
-                
-                break;
-            case KeyCode.S:
+                    break;
+            }
+        }
+        //空中操作
+        else if(Player.Instance.stateMachine.currentState.playerStateType == E_PlayerStateType.Air)
+        {
+            switch (key)
+            {
+                //case KeyCode.W:
+
+                //    break;
+                //case KeyCode.S:
 
 
-                break;
-            case KeyCode.A:
-                print("1");
-                moveDirection.x = -1; // 向左（假设X轴为左右方向）
-                break;
-            case KeyCode.D:
-                moveDirection.x = 1; // 向右
-                break;
-            case KeyCode.Mouse0:
-                print("1");
-               
-                break;
+                //    break;
+                //case KeyCode.A:
+
+
+                //    break;
+                //case KeyCode.D:
+
+                //    break;
+
+
+                case KeyCode.Mouse0:
+                    Player.Instance.stateMachine.ChangeState(Player.Instance.primaryAttack);
+
+                    break;
+            }
         }
     }
 
@@ -88,82 +65,33 @@ public class PlayerController : Entity
     {
         switch (key)
         {
-            case KeyCode.W:
-            case KeyCode.S:
+            //case KeyCode.W:
+            //case KeyCode.S:
                 
-                break;
-            case KeyCode.A:
-            case KeyCode.D:
-                moveDirection.x = 0; // 重置左右方向
-                break;
+            //    break;
+            //case KeyCode.A:
+            //case KeyCode.D:
+                
+            //    break;
         }
     }
 
     // 移除事件监听，避免内存泄漏
-    private void OnDestroy()
+    public void ControllerClose()
     {
         //移除注册的按键事件
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("A键", OnKeyDown);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("D键", OnKeyDown);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("W键", OnKeyDown);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("S键", OnKeyDown);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("鼠标左键", OnKeyDown);
-
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("A键", OnKeyUp);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("D键", OnKeyUp);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("W键", OnKeyUp);
-        EventCenter.GetInstance().RemoveEventListener<KeyCode>("S键", OnKeyUp);
+        EventCenter.GetInstance().RemoveEventListener<KeyCode>("某键按下", OnKeyDown);
+        EventCenter.GetInstance().RemoveEventListener<KeyCode>("某键抬起", OnKeyUp);
     }
 
-    //地面移动检测
-    private void GroundedMoveCheck()
+    //协程
+    public IEnumerator BusyFor(float _seconds)
     {
-        moveDirection.Normalize(); // 归一化方向向量
-    }
+        Player.Instance.SetBusy(true);
 
-    //空中移动检测
-    private void SkyMoveCheck()
-    {
+        yield return new WaitForSeconds(_seconds);
 
-    }
-
-    //墙面移动检测
-    private void WallMoveCheck()
-    {
-
-    }
-
-    private void AttackComboCheck()
-    {
-        if (AttackingStart()) 
-            return;
-
-        atkComboNum += 1;
-        if (atkComboNum == atkComboMaxNum) 
-            atkComboNum = 0;
-    }
-
-    private void Attack()
-    {
-        AttackComboCheck();
-
-        anim.SetBool("Attack", true);
-
-        AttackingStart();
-    }
-
-    //在攻击方法中调用，用来指代攻击动画开始
-    private bool AttackingStart()
-    {
-        isAttacking = true;
-        return isAttacking;
-    }
-
-    //在攻击动画末尾事件中调用，用来指代攻击动画结束
-    private bool AttackingEnd()
-    {
-        isAttacking = false;
-        return isAttacking;
+        Player.Instance.SetBusy(false);
     }
 }
 
