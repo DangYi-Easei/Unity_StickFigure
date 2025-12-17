@@ -49,9 +49,9 @@ public class InputMgr : BaseManager<InputMgr>
     {
         //事件中心模块 分发按下抬起事件
         if (Input.GetKeyDown(key))
-            EventCenter.GetInstance().EventTrigger("某键按下", key);
+            EventCenter.GetInstance().EventTrigger(EventName.KeyDown, key);
         //事件中心模块 分发按下抬起事件
         if (Input.GetKeyUp(key))
-            EventCenter.GetInstance().EventTrigger("某键抬起", key);
+            EventCenter.GetInstance().EventTrigger(EventName.KeyUp, key);
     }
 }

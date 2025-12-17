@@ -13,6 +13,9 @@ public class Player : Entity
     [Header("Move info")]
     public float moveSpeed = 12f;
     public float jumpForce;
+    // 当前水平移动速度（受加速度/最大速度限制）
+    public float currentXSpeed;
+    public float acceleration_X = 12f;
 
     [Header("Attack details")]
     public Vector2[] attackMovement;
@@ -25,6 +28,7 @@ public class Player : Entity
     public PlayerIdleState idleState { get; private set; }
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
+    public PlayerFallState fallState { get; private set; }
     //public PlayerAirState airState { get; private set; }
     //public PlayerWallSlideState wallSlide { get; private set; }
     //public PlayerWallJumpState wallJump { get; private set; }
@@ -34,6 +38,24 @@ public class Player : Entity
     //public PlayerDeadState deadState { get; private set; }
 
     #endregion
+
+
+    
+    protected override void Awake()
+    {
+        base.Awake();
+
+        instance = this;
+
+        stateMachine = new PlayerStateMachine();
+        
+        idleState = new PlayerIdleState(this,stateMachine,"Idle",E_PlayerStateType.Ground);
+        moveState = new PlayerMoveState(this, stateMachine, "Move", E_PlayerStateType.Ground);
+        jumpState = new PlayerJumpState(this, stateMachine, "Jump", E_PlayerStateType.Ground);
+        fallState = new PlayerFallState(this, stateMachine,"Fall",E_PlayerStateType.Air);
+
+        primaryAttack = new PlayerPrimaryAttackState(this, stateMachine, "Attack", E_PlayerStateType.Ground);
+    }
 
     protected override void Start()
     {
@@ -48,6 +70,11 @@ public class Player : Entity
     protected override void Update()
     {
         base.Update();
+
+        //调用玩家控制器的持续检测输入
+        PlayerController.GetInstance().InputUpdate();
+
+        stateMachine.currentState.Update();
     }
 
     private void OnDestroy()
@@ -76,5 +103,11 @@ public class Player : Entity
         }
     }
 
-    
+    public override void SetVelocity(float _xVelocity, float _yVelocity)
+    {
+
+        
+
+        base.SetVelocity(_xVelocity, _yVelocity);
+    }
 }

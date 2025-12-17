@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Windows;
 
 
 public enum E_PlayerStateType
@@ -12,13 +13,12 @@ public enum E_PlayerStateType
 public class PlayerState
 {
     protected PlayerStateMachine stateMachine;
-    public E_PlayerStateType playerStateType;
+    public E_PlayerStateType e_playerStateType { get; private set; }
     protected Player player;
 
     protected Rigidbody2D rb;
 
-    protected float xInput;
-    protected float yInput;
+    
     private string animBoolName;
 
     protected float stateTimer;//×´Ì¬¼ÆÊ±Æ÷
@@ -29,6 +29,7 @@ public class PlayerState
         this.player = _player;
         this.stateMachine = _stateMachine;
         this.animBoolName = _animBoolName;
+        this.e_playerStateType = _playerStateType;
     }
 
 
@@ -42,10 +43,6 @@ public class PlayerState
     public virtual void Update()
     {
         stateTimer -= Time.time;
-
-        xInput = Input.GetAxisRaw("Horizontal");
-        yInput = Input.GetAxisRaw("Vertical");
-        player.anim.SetFloat("yVelocity", rb.velocity.y);
     }
 
     public virtual void Exit()

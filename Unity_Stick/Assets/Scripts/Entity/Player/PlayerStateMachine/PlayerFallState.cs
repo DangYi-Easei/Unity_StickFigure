@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class PlayerFallState : PlayerState
 {
+    private E_PlayerStateType e_PlayerStateType;
+
     public PlayerFallState(Player _player, PlayerStateMachine _stateMachine, string _animBoolName, E_PlayerStateType _playerStateType) : base(_player, _stateMachine, _animBoolName, _playerStateType)
     {
+
+        //更改当前状态的位置标识
+        _playerStateType = e_PlayerStateType;
     }
 
     public override void Enter()
